@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import ui.project_overview as project_overview
 from services.analysis_service import AnalysisService
 from ui.project_overview import (
     filter_hotspot_rows,
@@ -81,4 +82,25 @@ def test_parse_ignore_patterns_strips_blanks_and_preserves_order() -> None:
     assert parse_ignore_patterns(" generated/** \n\nlegacy_*.py\n") == [
         "generated/**",
         "legacy_*.py",
+    ]
+
+
+def test_score_band_uses_the_documented_risk_boundaries() -> None:
+    """Catch dashboard labels drifting away from the score ranges users see."""
+
+    assert hasattr(project_overview, "score_band")
+    assert [
+        project_overview.score_band(score)
+        for score in (0, 20, 21, 40, 41, 60, 61, 80, 81, 100)
+    ] == [
+        ("Very Easy", "low"),
+        ("Very Easy", "low"),
+        ("Easy", "guarded"),
+        ("Easy", "guarded"),
+        ("Moderate", "moderate"),
+        ("Moderate", "moderate"),
+        ("Difficult", "high"),
+        ("Difficult", "high"),
+        ("Very Difficult", "critical"),
+        ("Very Difficult", "critical"),
     ]

@@ -56,7 +56,7 @@ def dependency_figure(
                     _node_color(name, modules[name], selected_module, dependencies, dependents)
                     for name in names
                 ],
-                "line": {"width": 1.5, "color": "rgba(35,35,35,0.65)"},
+                "line": {"width": 1.5, "color": "rgba(237,244,255,0.72)"},
             },
             name="Modules",
         )
@@ -67,10 +67,20 @@ def dependency_figure(
         hovermode="closest",
         clickmode="event+select",
         dragmode="pan",
+        font={
+            "family": "Inter, Segoe UI, sans-serif",
+            "color": "#AABBD0",
+        },
+        title_font={"color": "#EDF4FF", "size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin={"l": 15, "r": 15, "t": 55, "b": 15},
-        height=520,
+        margin={"l": 18, "r": 18, "t": 62, "b": 20},
+        height=560,
+        hoverlabel={
+            "bgcolor": "#142641",
+            "bordercolor": "#2A4968",
+            "font": {"color": "#EDF4FF"},
+        },
         xaxis={"visible": False},
         yaxis={"visible": False},
     )
@@ -97,7 +107,7 @@ def _edge_trace(
         mode="lines",
         line={
             "width": 3 if mode == "highlighted" else 1,
-            "color": "#457B9D" if mode == "highlighted" else "rgba(120,120,120,0.35)",
+            "color": "#53D4FF" if mode == "highlighted" else "rgba(145,164,189,0.24)",
         },
         hoverinfo="skip",
         name="Dependencies",
@@ -118,20 +128,20 @@ def _node_color(
     dependents: set[str],
 ) -> str:
     if name == selected_module:
-        return "#277DA1"
+        return "#53D4FF"
     if name in dependencies:
-        return "#43AA8B"
+        return "#3DD6A3"
     if name in dependents:
-        return "#F8961E"
+        return "#8587FF"
     if module.confusion_score <= 20:
-        return "#2A9D8F"
+        return "#3DD6A3"
     if module.confusion_score <= 40:
-        return "#8AB17D"
+        return "#8FD14F"
     if module.confusion_score <= 60:
-        return "#E9C46A"
+        return "#F9C74F"
     if module.confusion_score <= 80:
-        return "#F4A261"
-    return "#E76F51"
+        return "#F8961E"
+    return "#F05D75"
 
 
 def _module_hover(module: ModuleMetrics) -> str:
@@ -159,8 +169,10 @@ def _empty_graph() -> go.Figure:
     )
     figure.update_layout(
         title="Internal Dependency Map",
+        font={"family": "Inter, Segoe UI, sans-serif", "color": "#AABBD0"},
+        title_font={"color": "#EDF4FF", "size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=520,
+        height=560,
     )
     return figure

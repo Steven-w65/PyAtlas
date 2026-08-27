@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
@@ -31,3 +32,23 @@ def test_app_analyzes_project_and_renders_summary() -> None:
     assert any(item.label == "Python Files" and item.value == "2" for item in app.metric)
     assert any("simple_project" in item.value for item in app.markdown)
     assert len(app.dataframe) >= 3
+
+
+def test_app_emits_no_streamlit_deprecation_warnings(caplog) -> None:
+    """Catch retired widget arguments anywhere in the complete dashboard flow."""
+
+    from streamlit import deprecation_util
+
+    caplog.set_level(logging.WARNING)
+    deprecation_util._LOGGER.addHandler(caplog.handler)
+    try:
+        app = AppTest.from_file(APP_PATH)
+        app.run(timeout=20)
+
+        app.text_input[0].input(str(SAMPLES / "simple_project"))
+        app.button[0].click()
+        app.run(timeout=30)
+    finally:
+        deprecation_util._LOGGER.removeHandler(caplog.handler)
+
+    assert "Please replace `use_container_width` with `width`" not in caplog.text

@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from models import ProjectAnalysis
 
 
-_CONFUSION_COLORS = ["#2A9D8F", "#8AB17D", "#E9C46A", "#F4A261", "#E76F51"]
+_CONFUSION_COLORS = ["#3DD6A3", "#8FD14F", "#F9C74F", "#F8961E", "#F05D75"]
 
 
 def complexity_distribution(analysis: ProjectAnalysis) -> go.Figure:
@@ -31,6 +31,7 @@ def complexity_distribution(analysis: ProjectAnalysis) -> go.Figure:
             x=labels,
             y=[counts[label] for label in labels],
             marker_color=_CONFUSION_COLORS[1:],
+            marker_line={"width": 0},
             hovertemplate="%{x}: %{y} functions<extra></extra>",
         )
     )
@@ -56,6 +57,7 @@ def confusion_distribution(analysis: ProjectAnalysis) -> go.Figure:
             x=labels,
             y=counts,
             marker_color=_CONFUSION_COLORS,
+            marker_line={"width": 0},
             hovertemplate="%{x}: %{y} symbols<extra></extra>",
         )
     )
@@ -82,7 +84,7 @@ def size_vs_complexity(analysis: ProjectAnalysis) -> go.Figure:
                 "cmax": 100,
                 "showscale": True,
                 "colorbar": {"title": "Score"},
-                "line": {"width": 1, "color": "rgba(40,40,40,0.5)"},
+                "line": {"width": 1.5, "color": "rgba(237,244,255,0.72)"},
             },
             hovertemplate=(
                 "Module: %{customdata}<br>Lines: %{x}<br>"
@@ -153,10 +155,36 @@ def _style(
         title={"text": title, "x": 0.02, "xanchor": "left"},
         xaxis_title=x_title,
         yaxis_title=y_title,
+        font={
+            "family": "Inter, Segoe UI, sans-serif",
+            "color": "#AABBD0",
+            "size": 12,
+        },
+        title_font={"color": "#EDF4FF", "size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin={"l": 35, "r": 20, "t": 55, "b": 35},
-        height=340,
+        margin={"l": 42, "r": 22, "t": 62, "b": 42},
+        height=360,
+        bargap=0.34,
+        hoverlabel={
+            "bgcolor": "#142641",
+            "bordercolor": "#2A4968",
+            "font": {"color": "#EDF4FF", "family": "Inter, Segoe UI, sans-serif"},
+        },
+        hovermode="closest",
+    )
+    figure.update_xaxes(
+        gridcolor="rgba(145,164,189,0.10)",
+        linecolor="rgba(145,164,189,0.16)",
+        zeroline=False,
+        tickfont={"color": "#91A4BD"},
+        title_font={"color": "#91A4BD"},
+    )
+    figure.update_yaxes(
+        gridcolor="rgba(145,164,189,0.10)",
+        linecolor="rgba(145,164,189,0.16)",
+        zeroline=False,
+        tickfont={"color": "#91A4BD"},
+        title_font={"color": "#91A4BD"},
     )
     return figure
-

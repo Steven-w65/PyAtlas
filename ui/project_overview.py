@@ -28,6 +28,20 @@ HOTSPOT_COLUMNS = [
 ]
 
 
+def score_band(score: float) -> tuple[str, str]:
+    """Return the user-facing risk label and visual tone for a score."""
+
+    if score <= 20:
+        return "Very Easy", "low"
+    if score <= 40:
+        return "Easy", "guarded"
+    if score <= 60:
+        return "Moderate", "moderate"
+    if score <= 80:
+        return "Difficult", "high"
+    return "Very Difficult", "critical"
+
+
 def summary_values(analysis: ProjectAnalysis) -> OrderedDict[str, str | int]:
     """Return the six required project-card values in display order."""
 
@@ -108,18 +122,75 @@ def render_overview(
 ) -> dict[str, Any] | None:
     """Render overview content and return a newly selected hotspot row."""
 
-    columns = st.columns(6)
-    for column, (label, value) in zip(columns, summary_values(analysis).items(), strict=True):
-        column.metric(label, value)
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Project pulse</div>
+                <div class="atlas-section__title">Health at a glance</div>
+            </div>
+            <div class="atlas-section__copy">A compact read on scale, structure, and the concentration of maintainability risk.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    summary_items = list(summary_values(analysis).items())
+    for start in range(0, len(summary_items), 3):
+        columns = st.columns(3, gap="medium")
+        for column, (label, value) in zip(
+            columns,
+            summary_items[start : start + 3],
+            strict=True,
+        ):
+            column.metric(label, value)
 
-    left, right = st.columns(2)
-    left.plotly_chart(confusion_distribution(analysis), use_container_width=True)
-    right.plotly_chart(complexity_distribution(analysis), use_container_width=True)
-    left, right = st.columns(2)
-    left.plotly_chart(size_vs_complexity(analysis), use_container_width=True)
-    right.plotly_chart(dependency_risk(analysis), use_container_width=True)
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Signals</div>
+                <div class="atlas-section__title">Risk landscape</div>
+            </div>
+            <div class="atlas-section__copy">Compare score shape, structural complexity, file scale, and dependency pressure.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    left, right = st.columns(2, gap="medium")
+    left.plotly_chart(
+        confusion_distribution(analysis),
+        width="stretch",
+        config={"displayModeBar": False},
+    )
+    right.plotly_chart(
+        complexity_distribution(analysis),
+        width="stretch",
+        config={"displayModeBar": False},
+    )
+    left, right = st.columns(2, gap="medium")
+    left.plotly_chart(
+        size_vs_complexity(analysis),
+        width="stretch",
+        config={"displaylogo": False},
+    )
+    right.plotly_chart(
+        dependency_risk(analysis),
+        width="stretch",
+        config={"displaylogo": False},
+    )
 
-    st.subheader("Hotspots")
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Priority queue</div>
+                <div class="atlas-section__title">Hotspots</div>
+            </div>
+            <div class="atlas-section__copy">Select a row to carry that module or function into the detail inspector.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     rows = filter_hotspot_rows(hotspot_rows(analysis), risk_filter)
     if not rows:
         st.info("No functions or modules match the selected risk filter.")
@@ -128,7 +199,19 @@ def render_overview(
         rows,
         column_order=HOTSPOT_COLUMNS,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
+        height=440,
+        column_config={
+            "Confusion Score": st.column_config.ProgressColumn(
+                "Risk",
+                help="Explainable Confusion Score from 0 to 100.",
+                min_value=0,
+                max_value=100,
+                format="%.1f",
+            ),
+            "File": st.column_config.TextColumn(width="large"),
+            "Issues": st.column_config.NumberColumn(format="%d"),
+        },
         on_select="rerun",
         selection_mode="single-row",
         key="hotspot_table",
@@ -148,4 +231,3 @@ def _issue_count(
         issue.file_path == file_path and issue.symbol_name == symbol_name
         for issue in analysis.issues
     )
-

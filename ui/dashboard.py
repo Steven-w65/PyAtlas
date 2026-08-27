@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+from html import escape
+
 import streamlit as st
 
 from services import AnalysisService, ExportService
 from ui.function_details import render_function_details
 from ui.module_details import render_module_details
-from ui.project_overview import render_overview
+from ui.project_overview import render_overview, score_band
 from ui.sidebar import render_sidebar
+from ui.theme import APP_CSS
 from visualization.dependency_graph import dependency_figure
 
 
@@ -34,8 +37,18 @@ def render_dashboard() -> None:
     """Compose controls, analysis results, exports, and navigation state."""
 
     initialize_session_state()
+    st.markdown(APP_CSS, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="atlas-kicker">Local code intelligence</div>',
+        unsafe_allow_html=True,
+    )
     st.title("PyAtlas")
-    st.caption("Interactive, explainable maintainability mapping for Python projects")
+    st.markdown(
+        '<p class="atlas-lead">Map the architecture behind your Python code. '
+        "Surface complexity, dependency pressure, and maintainability risk in one "
+        "explainable workspace.</p><div class=\"atlas-rule\"></div>",
+        unsafe_allow_html=True,
+    )
     request = render_sidebar()
 
     if request.analyze:
@@ -59,15 +72,52 @@ def render_dashboard() -> None:
 
     analysis = st.session_state.analysis
     if analysis is None:
-        st.info("Choose a local Python project in the sidebar to build its maintainability map.")
+        st.markdown(
+            """
+            <div class="welcome-grid">
+                <div class="welcome-card">
+                    <div class="welcome-card__index">01 · MAP</div>
+                    <div class="welcome-card__title">See the architecture</div>
+                    <div class="welcome-card__copy">Trace internal modules, fan-in, fan-out, and circular dependencies.</div>
+                </div>
+                <div class="welcome-card">
+                    <div class="welcome-card__index">02 · PRIORITIZE</div>
+                    <div class="welcome-card__title">Find meaningful hotspots</div>
+                    <div class="welcome-card__copy">Rank modules and functions by transparent, metric-backed risk signals.</div>
+                </div>
+                <div class="welcome-card">
+                    <div class="welcome-card__index">03 · UNDERSTAND</div>
+                    <div class="welcome-card__title">Explain every score</div>
+                    <div class="welcome-card__copy">Inspect contributions, recommendations, and source without leaving the map.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.info(
+            "Choose a local Python project in the sidebar to build its maintainability map.",
+            icon="🧭",
+        )
         return
 
-    st.markdown(f"### {analysis.project_name}")
-    st.caption(analysis.project_path)
+    band_label, band_tone = score_band(analysis.project_confusion_score)
+    st.markdown(
+        f"""
+        <div class="project-ribbon">
+            <div>
+                <div class="project-ribbon__eyebrow">Active analysis workspace</div>
+                <div class="project-ribbon__name">{escape(analysis.project_name)}</div>
+                <div class="project-ribbon__path">{escape(analysis.project_path)}</div>
+            </div>
+            <div class="risk-chip tone-{band_tone}">{band_label} · {analysis.project_confusion_score:.1f}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.info(
         "Confusion Score is a heuristic estimate based on structural code metrics. "
         "A high score does not automatically mean the code is poorly written.",
-        icon="ℹ️",
+        icon="💡",
     )
     if analysis.errors:
         with st.expander(f"Partial analysis warnings ({len(analysis.errors)})"):
@@ -83,18 +133,31 @@ def render_dashboard() -> None:
             st.session_state.selected_function = (selected["File"], selected["Name"])
             st.session_state.selected_module = None
 
-    st.subheader("Dependency map")
-    graph_event = st.plotly_chart(
-        dependency_figure(
-            analysis,
-            selected_module=st.session_state.selected_module,
-            size_by=request.graph_size_by,
-        ),
-        use_container_width=True,
-        on_select="rerun",
-        selection_mode="points",
-        key="dependency_graph",
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Architecture</div>
+                <div class="atlas-section__title">Dependency map</div>
+            </div>
+            <div class="atlas-section__copy">Select a node to highlight its direct dependencies and dependents.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
+    with st.container(border=True):
+        graph_event = st.plotly_chart(
+            dependency_figure(
+                analysis,
+                selected_module=st.session_state.selected_module,
+                size_by=request.graph_size_by,
+            ),
+            width="stretch",
+            on_select="rerun",
+            selection_mode="points",
+            key="dependency_graph",
+            config={"displaylogo": False, "scrollZoom": True},
+        )
     graph_points = getattr(getattr(graph_event, "selection", None), "points", [])
     if not graph_points and isinstance(graph_event, dict):
         graph_points = graph_event.get("selection", {}).get("points", [])
@@ -106,8 +169,19 @@ def render_dashboard() -> None:
             st.session_state.selected_module = selected_name
             st.session_state.selected_function = None
 
-    st.subheader("Inspect details")
-    module_tab, function_tab = st.tabs(["Module", "Function"])
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Deep dive</div>
+                <div class="atlas-section__title">Inspect details</div>
+            </div>
+            <div class="atlas-section__copy">Move from the project view into module relationships, function metrics, and source.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    module_tab, function_tab = st.tabs(["◫  Module", "ƒ  Function"])
     with module_tab:
         module_names = [module.name for module in analysis.modules]
         if module_names:
@@ -159,19 +233,33 @@ def render_dashboard() -> None:
         else:
             st.info("No analyzed functions are available.")
 
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Take it with you</div>
+                <div class="atlas-section__title">Export analysis</div>
+            </div>
+            <div class="atlas-section__copy">Save the complete data model or share a focused hotspot list.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     export = ExportService()
-    json_column, csv_column, _ = st.columns([1, 1, 3])
+    json_column, csv_column, _ = st.columns([1, 1.25, 3])
     json_column.download_button(
         "Download JSON",
         export.to_json(analysis),
         file_name=f"{analysis.project_name}-pyatlas.json",
         mime="application/json",
-        use_container_width=True,
+        width="stretch",
+        icon=":material/data_object:",
     )
     csv_column.download_button(
-        "Download hotspot CSV",
+        "Hotspots CSV",
         export.hotspot_csv(analysis),
         file_name=f"{analysis.project_name}-hotspots.csv",
         mime="text/csv",
-        use_container_width=True,
+        width="stretch",
+        icon=":material/table_view:",
     )

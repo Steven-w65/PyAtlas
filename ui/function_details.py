@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from html import escape
 from pathlib import Path
 
 import streamlit as st
 
 from models import FunctionMetrics, ProjectAnalysis
 from ui.module_details import contribution_rows
+from ui.project_overview import score_band
 
 
 def find_function(
@@ -55,31 +57,49 @@ def render_function_details(
         st.info("Select a function to inspect its metrics and source.")
         return
 
-    st.markdown(f"#### `{function.qualified_name}`")
-    st.caption(
-        f"{function.file_path} · lines {function.start_line}–{function.end_line}"
+    band_label, band_tone = score_band(function.confusion_score)
+    st.markdown(
+        f"""
+        <div class="project-ribbon">
+            <div>
+                <div class="project-ribbon__eyebrow">Selected function</div>
+                <div class="project-ribbon__name">{escape(function.qualified_name)}</div>
+                <div class="project-ribbon__path">{escape(function.file_path)} · lines {function.start_line}–{function.end_line}</div>
+            </div>
+            <div class="risk-chip tone-{band_tone}">{band_label} · {function.confusion_score:.1f}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    first = st.columns(4)
+    first = st.columns(4, gap="medium")
     first[0].metric("Confusion Score", f"{function.confusion_score:.2f}")
     first[1].metric("Complexity", function.complexity)
     first[2].metric("Lines", function.lines)
     first[3].metric("Nesting", function.nesting_depth)
-    second = st.columns(4)
+    second = st.columns(4, gap="medium")
     second[0].metric("Parameters", function.parameters)
     second[1].metric("Branches", function.branches)
     second[2].metric("Local Variables", function.local_variables)
     second[3].metric("Calls", function.calls)
-    third = st.columns(4)
+    third = st.columns(4, gap="medium")
     third[0].metric("Loops", function.loops)
     third[1].metric("Try Blocks", function.try_blocks)
     third[2].metric("Returns", function.returns)
     third[3].metric("Nested Functions", function.nested_functions)
 
-    st.markdown("**Why this score?**")
+    st.markdown("##### Why this score?")
     st.dataframe(
         contribution_rows(function.score_contributions),
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
+        column_config={
+            "Risk %": st.column_config.ProgressColumn(
+                min_value=0,
+                max_value=100,
+                format="%.1f",
+            ),
+            "Why": st.column_config.TextColumn(width="large"),
+        },
     )
 
     issues = [
@@ -88,15 +108,14 @@ def render_function_details(
         if issue.file_path == function.file_path
         and issue.symbol_name == function.qualified_name
     ]
-    st.markdown("**Recommendations**")
+    st.markdown("##### Recommendations")
     if not issues:
         st.write("No function-level recommendations were triggered.")
     for issue in issues:
         st.warning(f"{issue.message} ({issue.severity})")
 
-    st.markdown("**Source preview**")
+    st.markdown("##### Source preview")
     st.code(
         source_excerpt(function.file_path, function.start_line, function.end_line),
         language="python",
     )
-
