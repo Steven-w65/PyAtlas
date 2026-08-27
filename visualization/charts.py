@@ -163,7 +163,7 @@ def _style(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         margin={"l": 42, "r": 22, "t": 62, "b": 42},
-        height=360,
+        height=285,
         bargap=0.34,
         hoverlabel={"font": {"family": "Inter, Segoe UI, sans-serif"}},
         hovermode="closest",

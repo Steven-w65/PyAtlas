@@ -54,8 +54,8 @@ html, body, [class*="css"] {
 
 .block-container {
     max-width: 1480px;
-    padding-top: 2.25rem;
-    padding-bottom: 5rem;
+    padding-top: 1.25rem;
+    padding-bottom: 3rem;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -65,10 +65,10 @@ h1, h2, h3, h4, h5, h6,
 }
 
 h1 {
-    font-size: clamp(2.5rem, 5vw, 4.75rem) !important;
-    line-height: 0.98 !important;
+    font-size: clamp(2.35rem, 4vw, 3.65rem) !important;
+    line-height: 1 !important;
     font-weight: 760 !important;
-    margin: 0.35rem 0 0.65rem !important;
+    margin: 0.1rem 0 0.35rem !important;
 }
 
 h2, h3 {
@@ -84,26 +84,26 @@ a {
 }
 
 .atlas-lead {
-    max-width: 760px;
+    max-width: 900px;
     color: var(--atlas-muted) !important;
-    font-size: 1.08rem;
-    line-height: 1.7;
-    margin: 0 0 2.1rem;
+    font-size: 0.96rem;
+    line-height: 1.5;
+    margin: 0 0 0.65rem;
 }
 
 .atlas-rule {
     height: 1px;
     background: linear-gradient(90deg, var(--atlas-border-strong), transparent 72%);
-    margin: 0.2rem 0 1.75rem;
+    margin: 0 0 0.85rem;
 }
 
 .project-ribbon {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
-    padding: 1.25rem 1.4rem;
-    margin: 0.3rem 0 1rem;
+    gap: 1rem;
+    padding: 0.8rem 0.95rem;
+    margin: 0.15rem 0 0.55rem;
     border: 1px solid var(--atlas-border-strong);
     border-radius: var(--atlas-radius);
     background: var(--atlas-ribbon);
@@ -122,7 +122,7 @@ a {
 
 .project-ribbon__name {
     color: var(--atlas-text);
-    font-size: 1.25rem;
+    font-size: 1.08rem;
     font-weight: 700;
     margin-top: 0.2rem;
 }
@@ -140,7 +140,7 @@ a {
     flex: 0 0 auto;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.55rem 0.78rem;
+    padding: 0.42rem 0.65rem;
     border-radius: 999px;
     border: 1px solid currentColor;
     font-size: 0.76rem;
@@ -167,12 +167,12 @@ a {
     align-items: flex-end;
     justify-content: space-between;
     gap: 1rem;
-    margin: 2.6rem 0 1rem;
+    margin: 1.45rem 0 0.65rem;
 }
 
 .atlas-section__title {
     color: var(--atlas-text);
-    font-size: 1.45rem;
+    font-size: 1.22rem;
     font-weight: 700;
     letter-spacing: -0.025em;
     margin-top: 0.18rem;
@@ -180,7 +180,7 @@ a {
 
 .atlas-section__copy {
     color: var(--atlas-muted);
-    font-size: 0.86rem;
+    font-size: 0.78rem;
     max-width: 520px;
     text-align: right;
 }
@@ -193,8 +193,8 @@ a {
 }
 
 .welcome-card {
-    min-height: 132px;
-    padding: 1.15rem;
+    min-height: 112px;
+    padding: 0.9rem;
     border: 1px solid var(--atlas-border);
     border-radius: var(--atlas-radius);
     background: var(--atlas-panel);
@@ -226,7 +226,7 @@ a {
 }
 
 [data-testid="stSidebar"] > div:first-child {
-    padding-top: 1.3rem;
+    padding-top: 0.8rem;
 }
 
 [data-testid="stSidebar"] h2,
@@ -240,7 +240,7 @@ a {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.25rem 0 1.55rem;
+    padding: 0.1rem 0 0.9rem;
 }
 
 .sidebar-brand__mark {
@@ -271,17 +271,17 @@ a {
 }
 
 .sidebar-eyebrow {
-    margin: 0.35rem 0 0.65rem;
+    margin: 0.2rem 0 0.45rem;
 }
 
 .privacy-note {
-    padding: 0.8rem 0.9rem;
+    padding: 0.6rem 0.7rem;
     border: 1px solid color-mix(in srgb, var(--atlas-green) 24%, transparent);
     border-radius: 12px;
     background: color-mix(in srgb, var(--atlas-green) 7%, transparent);
     color: var(--atlas-privacy-text);
-    font-size: 0.74rem;
-    line-height: 1.5;
+    font-size: 0.7rem;
+    line-height: 1.4;
 }
 
 .privacy-note strong {
@@ -295,6 +295,14 @@ a {
     border-color: var(--atlas-border) !important;
     color: var(--atlas-text) !important;
     border-radius: 11px !important;
+}
+
+[data-testid="stTextArea"] textarea {
+    min-height: 74px !important;
+}
+
+[data-testid="stSidebar"] hr {
+    margin: 0.75rem 0 !important;
 }
 
 [data-testid="stTextInput"] input:focus,
@@ -332,8 +340,8 @@ a {
 }
 
 [data-testid="stMetric"] {
-    min-height: 116px;
-    padding: 1rem 1.05rem;
+    min-height: 88px;
+    padding: 0.62rem 0.7rem;
     border: 1px solid var(--atlas-border);
     border-radius: var(--atlas-radius);
     background: var(--atlas-panel);
@@ -348,17 +356,63 @@ a {
 
 [data-testid="stMetricLabel"] {
     color: var(--atlas-muted);
-    font-size: 0.71rem;
+    font-size: 0.64rem;
     font-weight: 700;
     letter-spacing: 0.055em;
     text-transform: uppercase;
 }
 
+[data-testid="stMetricLabel"] p {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    line-height: 1.25;
+}
+
 [data-testid="stMetricValue"] {
     color: var(--atlas-text);
     font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
-    font-size: 1.65rem;
+    font-size: 1.35rem;
     font-weight: 700;
+}
+
+.st-key-project_kpis [data-testid="stHorizontalBlock"],
+[data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) {
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.st-key-project_kpis [data-testid="stColumn"],
+[data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > [data-testid="stColumn"] {
+    flex: 1 1 126px !important;
+    min-width: 118px !important;
+    width: auto !important;
+}
+
+.st-key-module_kpis [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > [data-testid="stColumn"] {
+    flex: 1 1 104px !important;
+    min-width: 104px !important;
+}
+
+.explore-panel-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 38px;
+    padding: 0 0.15rem 0.45rem;
+}
+
+.explore-panel-heading__title {
+    color: var(--atlas-text);
+    font-size: 0.98rem;
+    font-weight: 700;
+}
+
+.explore-panel-heading__copy {
+    color: var(--atlas-muted);
+    font-size: 0.7rem;
+    text-align: right;
 }
 
 [data-testid="stVerticalBlockBorderWrapper"] {
@@ -401,7 +455,7 @@ a {
 }
 
 [data-baseweb="tab"] {
-    height: 2.8rem;
+    height: 2.35rem;
     padding: 0 1rem;
     border-radius: 10px 10px 0 0;
     color: var(--atlas-muted);
@@ -424,10 +478,12 @@ hr {
 }
 
 @media (max-width: 900px) {
-    .block-container { padding-top: 1.5rem; }
+    .block-container { padding-top: 1rem; }
     .project-ribbon { align-items: flex-start; flex-direction: column; }
     .atlas-section { align-items: flex-start; flex-direction: column; }
     .atlas-section__copy { text-align: left; }
+    .explore-panel-heading { align-items: flex-start; flex-direction: column; gap: 0.15rem; }
+    .explore-panel-heading__copy { text-align: left; }
     .welcome-grid { grid-template-columns: 1fr; }
 }
 

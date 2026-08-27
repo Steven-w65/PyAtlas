@@ -9,7 +9,7 @@ import streamlit as st
 from services import AnalysisService, ExportService
 from ui.function_details import render_function_details
 from ui.module_details import render_module_details
-from ui.project_overview import render_overview, score_band
+from ui.project_overview import render_hotspots, render_overview, score_band
 from ui.sidebar import render_sidebar
 from ui.theme import APP_CSS
 from visualization.dependency_graph import dependency_figure
@@ -120,7 +120,23 @@ def render_dashboard() -> None:
             for error in analysis.errors:
                 st.code(error, language=None)
 
-    selected = render_overview(analysis, request.risk_filter)
+    render_overview(analysis)
+
+    st.markdown(
+        """
+        <div class="atlas-section">
+            <div>
+                <div class="atlas-section__eyebrow">Explore</div>
+                <div class="atlas-section__title">Priorities and architecture</div>
+            </div>
+            <div class="atlas-section__copy">Move from ranked hotspots to their position in the dependency structure.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    hotspot_column, graph_column = st.columns([1.08, 1], gap="medium")
+    with hotspot_column:
+        selected = render_hotspots(analysis, request.risk_filter)
     if selected:
         if selected["Type"] == "Module":
             st.session_state.selected_module = selected["Name"]
@@ -129,19 +145,16 @@ def render_dashboard() -> None:
             st.session_state.selected_function = (selected["File"], selected["Name"])
             st.session_state.selected_module = None
 
-    st.markdown(
-        """
-        <div class="atlas-section">
-            <div>
-                <div class="atlas-section__eyebrow">Architecture</div>
-                <div class="atlas-section__title">Dependency map</div>
+    with graph_column:
+        st.markdown(
+            """
+            <div class="explore-panel-heading">
+                <div class="explore-panel-heading__title">Dependency map</div>
+                <div class="explore-panel-heading__copy">Select a node to highlight direct relationships.</div>
             </div>
-            <div class="atlas-section__copy">Select a node to highlight its direct dependencies and dependents.</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    with st.container(border=True):
+            """,
+            unsafe_allow_html=True,
+        )
         graph_event = st.plotly_chart(
             dependency_figure(
                 analysis,

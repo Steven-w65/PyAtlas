@@ -118,9 +118,8 @@ def filter_hotspot_rows(
 
 def render_overview(
     analysis: ProjectAnalysis,
-    risk_filter: str,
-) -> dict[str, Any] | None:
-    """Render overview content and return a newly selected hotspot row."""
+) -> None:
+    """Render compact project metrics and risk-signal charts."""
 
     st.markdown(
         """
@@ -135,13 +134,9 @@ def render_overview(
         unsafe_allow_html=True,
     )
     summary_items = list(summary_values(analysis).items())
-    for start in range(0, len(summary_items), 3):
-        columns = st.columns(3, gap="medium")
-        for column, (label, value) in zip(
-            columns,
-            summary_items[start : start + 3],
-            strict=True,
-        ):
+    with st.container(key="project_kpis"):
+        columns = st.columns(6, gap="small")
+        for column, (label, value) in zip(columns, summary_items, strict=True):
             column.metric(label, value)
 
     st.markdown(
@@ -179,14 +174,18 @@ def render_overview(
         config={"displaylogo": False},
     )
 
+
+def render_hotspots(
+    analysis: ProjectAnalysis,
+    risk_filter: str,
+) -> dict[str, Any] | None:
+    """Render the compact hotspot selector and return its selected row."""
+
     st.markdown(
         """
-        <div class="atlas-section">
-            <div>
-                <div class="atlas-section__eyebrow">Priority queue</div>
-                <div class="atlas-section__title">Hotspots</div>
-            </div>
-            <div class="atlas-section__copy">Select a row to carry that module or function into the detail inspector.</div>
+        <div class="explore-panel-heading">
+            <div class="explore-panel-heading__title">Hotspots</div>
+            <div class="explore-panel-heading__copy">Select a module or function to inspect.</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -200,7 +199,7 @@ def render_overview(
         column_order=HOTSPOT_COLUMNS,
         hide_index=True,
         width="stretch",
-        height=440,
+        height=400,
         column_config={
             "Confusion Score": st.column_config.ProgressColumn(
                 "Risk",

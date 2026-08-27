@@ -85,6 +85,21 @@ def test_dependency_graph_preserves_nodes_and_selection_metadata() -> None:
     assert colors["app"] != colors["helpers"]
 
 
+def test_dashboard_visualizations_fit_the_compact_layout() -> None:
+    """Catch charts regrowing enough to push Explore below the next viewport."""
+
+    analysis = AnalysisService().analyze_project(SAMPLES / "simple_project")
+    signal_figures = [
+        complexity_distribution(analysis),
+        confusion_distribution(analysis),
+        size_vs_complexity(analysis),
+        dependency_risk(analysis),
+    ]
+
+    assert {figure.layout.height for figure in signal_figures} == {285}
+    assert dependency_figure(analysis).layout.height == 400
+
+
 def test_all_visualizations_handle_empty_data() -> None:
     analysis = empty_analysis()
     figures = [

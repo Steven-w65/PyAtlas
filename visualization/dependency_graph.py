@@ -62,7 +62,6 @@ def dependency_figure(
         )
     )
     figure.update_layout(
-        title={"text": "Internal Dependency Map", "x": 0.02, "xanchor": "left"},
         showlegend=False,
         hovermode="closest",
         clickmode="event+select",
@@ -70,11 +69,10 @@ def dependency_figure(
         font={
             "family": "Inter, Segoe UI, sans-serif",
         },
-        title_font={"size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin={"l": 18, "r": 18, "t": 62, "b": 20},
-        height=560,
+        margin={"l": 14, "r": 14, "t": 18, "b": 14},
+        height=400,
         xaxis={"visible": False},
         yaxis={"visible": False},
     )
@@ -162,11 +160,10 @@ def _empty_graph() -> go.Figure:
         showarrow=False,
     )
     figure.update_layout(
-        title="Internal Dependency Map",
         font={"family": "Inter, Segoe UI, sans-serif"},
-        title_font={"size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=560,
+        margin={"l": 14, "r": 14, "t": 18, "b": 14},
+        height=400,
     )
     return figure

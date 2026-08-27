@@ -82,21 +82,21 @@ def render_module_details(analysis: ProjectAnalysis, module_name: str) -> None:
         """,
         unsafe_allow_html=True,
     )
-    first = st.columns(4, gap="medium")
-    first[0].metric("Confusion Score", f"{module.confusion_score:.2f}")
-    first[1].metric("Lines", module.lines)
-    first[2].metric("Functions", module.function_count)
-    first[3].metric("Classes", module.class_count)
-    second = st.columns(4, gap="medium")
-    second[0].metric("Fan-In", module.fan_in)
-    second[1].metric("Fan-Out", module.fan_out)
-    second[2].metric(
-        "Maintainability",
-        "Unavailable"
-        if module.maintainability_index is None
-        else f"{module.maintainability_index:.2f}",
-    )
-    second[3].metric("Max Complexity", module.max_function_complexity)
+    with st.container(key="module_kpis"):
+        metrics = st.columns(8, gap="small")
+        metrics[0].metric("Confusion Score", f"{module.confusion_score:.2f}")
+        metrics[1].metric("Lines", module.lines)
+        metrics[2].metric("Functions", module.function_count)
+        metrics[3].metric("Classes", module.class_count)
+        metrics[4].metric("Fan-In", module.fan_in)
+        metrics[5].metric("Fan-Out", module.fan_out)
+        metrics[6].metric(
+            "Maintainability",
+            "Unavailable"
+            if module.maintainability_index is None
+            else f"{module.maintainability_index:.2f}",
+        )
+        metrics[7].metric("Max Complexity", module.max_function_complexity)
 
     dependencies, dependents = module_relations(analysis, module.name)
     st.markdown("##### Relationships")
