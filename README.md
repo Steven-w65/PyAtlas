@@ -140,6 +140,8 @@ Module scores combine function complexity, the largest function risk, capped mod
 
 Every function, class, and module score retains its raw metric, normalized risk, weight, point contribution, and explanation. A large file does not automatically receive a high score because file-size influence is deliberately capped and weighted alongside structural signals.
 
+The local-variable metric counts unique names bound in the function's own scope by assignments, loop targets, context-manager targets, exception handlers, assignment expressions, and structural pattern matching. Parameters, comprehension-only targets, attribute or subscript writes, and bindings inside nested functions, classes, or lambdas are excluded.
+
 Score labels used by the dashboard are:
 
 | Score | Label |
@@ -156,6 +158,7 @@ Score labels used by the dashboard are:
 - Static imports may differ from runtime behavior produced through dynamic loading or import hooks.
 - Radon and AST analysis target valid Python syntax; invalid files are reported and skipped or partially represented.
 - Source preview reads the selected file again, so a file changed after analysis may differ from the recorded metrics.
+- Projects containing paths that resolve to the same importable module name, such as `pkg.py` and `pkg/__init__.py`, are rejected with a collision error instead of returning incomplete metrics.
 - Analysis is intended for small-to-medium local Python projects; persistent caching is not included in this version.
 - Duplicate-code detection is reserved behind a public analyzer interface but intentionally deferred from the MVP.
 - PyAtlas currently analyzes Python only and does not inspect Git history, pull requests, or runtime performance.

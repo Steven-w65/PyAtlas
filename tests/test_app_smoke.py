@@ -36,6 +36,12 @@ def test_streamlit_toolbar_uses_viewer_mode() -> None:
     assert config.get_option("client.toolbarMode") == "viewer"
 
 
+def test_streamlit_server_is_localhost_only() -> None:
+    """Catch the local source inspector becoming reachable over the network."""
+
+    assert config.get_option("server.address") == "localhost"
+
+
 def test_app_analyzes_project_and_renders_summary() -> None:
     app = AppTest.from_file(APP_PATH)
     app.run(timeout=20)

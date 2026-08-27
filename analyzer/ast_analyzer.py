@@ -152,6 +152,9 @@ class _FunctionCounter(ast.NodeVisitor):
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         return
 
+    def visit_Lambda(self, node: ast.Lambda) -> None:
+        return
+
     def visit_If(self, node: ast.If) -> None:
         self.branches += 1
         self.generic_visit(node)
@@ -164,12 +167,29 @@ class _FunctionCounter(ast.NodeVisitor):
         self.branches += len(node.cases)
         self.generic_visit(node)
 
+    def visit_MatchAs(self, node: ast.MatchAs) -> None:
+        if node.name:
+            self.local_variables.add(node.name)
+        self.generic_visit(node)
+
+    def visit_MatchStar(self, node: ast.MatchStar) -> None:
+        if node.name:
+            self.local_variables.add(node.name)
+        self.generic_visit(node)
+
+    def visit_MatchMapping(self, node: ast.MatchMapping) -> None:
+        if node.rest:
+            self.local_variables.add(node.rest)
+        self.generic_visit(node)
+
     def visit_For(self, node: ast.For) -> None:
         self.loops += 1
+        self.local_variables.update(_assigned_names(node.target))
         self.generic_visit(node)
 
     def visit_AsyncFor(self, node: ast.AsyncFor) -> None:
         self.loops += 1
+        self.local_variables.update(_assigned_names(node.target))
         self.generic_visit(node)
 
     def visit_While(self, node: ast.While) -> None:
@@ -184,6 +204,23 @@ class _FunctionCounter(ast.NodeVisitor):
         self.try_blocks += 1
         self.generic_visit(node)
 
+    def visit_With(self, node: ast.With) -> None:
+        for item in node.items:
+            if item.optional_vars is not None:
+                self.local_variables.update(_assigned_names(item.optional_vars))
+        self.generic_visit(node)
+
+    def visit_AsyncWith(self, node: ast.AsyncWith) -> None:
+        for item in node.items:
+            if item.optional_vars is not None:
+                self.local_variables.update(_assigned_names(item.optional_vars))
+        self.generic_visit(node)
+
+    def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
+        if node.name:
+            self.local_variables.add(node.name)
+        self.generic_visit(node)
+
     def visit_Return(self, node: ast.Return) -> None:
         self.returns += 1
         self.generic_visit(node)
@@ -195,7 +232,7 @@ class _FunctionCounter(ast.NodeVisitor):
     def visit_Assign(self, node: ast.Assign) -> None:
         for target in node.targets:
             self.local_variables.update(_assigned_names(target))
-        self.generic_visit(node.value)
+        self.visit(node.value)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         self.local_variables.update(_assigned_names(node.target))
@@ -206,13 +243,23 @@ class _FunctionCounter(ast.NodeVisitor):
         self.local_variables.update(_assigned_names(node.target))
         self.visit(node.value)
 
+    def visit_NamedExpr(self, node: ast.NamedExpr) -> None:
+        self.local_variables.update(_assigned_names(node.target))
+        self.visit(node.value)
+
 
 def _assigned_names(node: ast.AST) -> set[str]:
-    return {
-        child.id
-        for child in ast.walk(node)
-        if isinstance(child, ast.Name)
-    }
+    if isinstance(node, ast.Name):
+        return {node.id}
+    if isinstance(node, ast.Starred):
+        return _assigned_names(node.value)
+    if isinstance(node, (ast.List, ast.Tuple)):
+        return {
+            name
+            for element in node.elts
+            for name in _assigned_names(element)
+        }
+    return set()
 
 
 def _parameter_count(arguments: ast.arguments) -> int:

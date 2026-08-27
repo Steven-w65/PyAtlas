@@ -60,6 +60,27 @@ class AnalysisService:
             path: module_name_for_path(root, path)
             for path in paths
         }
+        paths_by_module: dict[str, list[Path]] = {}
+        for path, module_name in module_by_path.items():
+            paths_by_module.setdefault(module_name, []).append(path)
+        collisions = {
+            module_name: module_paths
+            for module_name, module_paths in paths_by_module.items()
+            if len(module_paths) > 1
+        }
+        if collisions:
+            details = "; ".join(
+                f"{module_name}: "
+                + ", ".join(
+                    path.relative_to(root).as_posix()
+                    for path in module_paths
+                )
+                for module_name, module_paths in sorted(collisions.items())
+            )
+            raise ValueError(
+                "Module name collision detected. Rename one of the conflicting "
+                f"paths before analyzing ({details})."
+            )
         module_names = set(module_by_path.values())
         analyzed: dict[str, _AnalyzedFile] = {}
         for path in paths:

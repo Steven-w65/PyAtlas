@@ -70,9 +70,47 @@ def test_counts_structural_metrics_without_counting_nested_function_body() -> No
     outer = next(item for item in functions if item.qualified_name == "outer")
 
     assert (method.branches, method.loops, method.try_blocks) == (2, 1, 1)
-    assert (method.returns, method.calls, method.local_variables) == (2, 2, 1)
+    assert (method.returns, method.calls, method.local_variables) == (2, 2, 2)
     assert outer.returns == 1
     assert outer.calls == 1
+
+
+def test_counts_assignment_style_local_bindings_in_the_current_scope() -> None:
+    source = """\
+async def bindings(items, manager, obj):
+    assigned = 1
+    annotated: int = 2
+    assigned += 1
+    for loop_item, *rest in items:
+        pass
+    async for async_item in items:
+        pass
+    with manager() as handle:
+        pass
+    async with manager() as async_handle:
+        pass
+    try:
+        pass
+    except ValueError as error:
+        pass
+    if captured := assigned:
+        pass
+    values = [comprehension_item for comprehension_item in items]
+    callback = lambda: (lambda_local := 1)
+    match assigned:
+        case {"value": matched, **remaining}:
+            pass
+        case [head, *tail]:
+            pass
+        case other as alias:
+            pass
+    obj.attribute = 1
+    items[0] = 2
+"""
+
+    functions, _, _ = ASTAnalyzer().analyze_file("bindings.py", source)
+
+    assert functions[0].local_variables == 17
 
 
 def test_calculates_required_maximum_nesting_depth() -> None:

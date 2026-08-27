@@ -80,6 +80,18 @@ def test_invalid_project_path_uses_user_facing_error(tmp_path: Path) -> None:
         AnalysisService().analyze_project(tmp_path / "missing")
 
 
+def test_duplicate_module_names_use_a_user_facing_error(tmp_path: Path) -> None:
+    """Catch one source file silently replacing another analysis record."""
+
+    (tmp_path / "pkg.py").write_text("VALUE = 'module'\n", encoding="utf-8")
+    package = tmp_path / "pkg"
+    package.mkdir()
+    (package / "__init__.py").write_text("VALUE = 'package'\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match=r"Module name collision.*pkg"):
+        AnalysisService().analyze_project(tmp_path)
+
+
 def test_duplication_interface_is_reserved_but_deferred() -> None:
     match = DuplicateMatch("a.py", "a", "b.py", "b", 0.9)
     assert match.similarity == 0.9
