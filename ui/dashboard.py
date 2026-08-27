@@ -38,10 +38,6 @@ def render_dashboard() -> None:
 
     initialize_session_state()
     st.markdown(APP_CSS, unsafe_allow_html=True)
-    st.markdown(
-        '<div class="atlas-kicker">Local code intelligence</div>',
-        unsafe_allow_html=True,
-    )
     st.title("PyAtlas")
     st.markdown(
         '<p class="atlas-lead">Map the architecture behind your Python code. '

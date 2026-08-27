@@ -8,6 +8,8 @@ from ui.project_overview import (
     summary_values,
 )
 from ui.sidebar import parse_ignore_patterns
+from visualization.charts import complexity_distribution
+from visualization.dependency_graph import dependency_figure
 
 
 SAMPLES = Path(__file__).parent / "sample_projects"
@@ -104,3 +106,16 @@ def test_score_band_uses_the_documented_risk_boundaries() -> None:
         ("Very Difficult", "critical"),
         ("Very Difficult", "critical"),
     ]
+
+
+def test_visualizations_delegate_text_surfaces_to_streamlit_theme() -> None:
+    """Catch figures pinning dark-mode text and hover colors in light mode."""
+
+    analysis = AnalysisService().analyze_project(SAMPLES / "simple_project")
+
+    for figure in (complexity_distribution(analysis), dependency_figure(analysis)):
+        assert figure.layout.font.color is None
+        assert figure.layout.title.font.color is None
+        assert figure.layout.hoverlabel.bgcolor is None
+        assert figure.layout.hoverlabel.bordercolor is None
+        assert figure.layout.hoverlabel.font.color is None

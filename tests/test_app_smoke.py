@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+from streamlit import config
 from streamlit.testing.v1 import AppTest
 
 
@@ -17,6 +18,22 @@ def test_app_renders_initial_state_without_exception() -> None:
     assert [item.value for item in app.title] == ["PyAtlas"]
     assert app.button[0].label == "Analyze project"
     assert app.info[0].value.startswith("Choose a local Python project")
+
+
+def test_app_omits_the_clipped_local_intelligence_kicker() -> None:
+    """Catch the removed pre-title label returning beneath the fixed header."""
+
+    app = AppTest.from_file(APP_PATH)
+
+    app.run(timeout=20)
+
+    assert all("Local code intelligence" not in item.value for item in app.markdown)
+
+
+def test_streamlit_toolbar_uses_viewer_mode() -> None:
+    """Catch localhost exposing developer-only controls such as Deploy."""
+
+    assert config.get_option("client.toolbarMode") == "viewer"
 
 
 def test_app_analyzes_project_and_renders_summary() -> None:

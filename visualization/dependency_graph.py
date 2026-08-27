@@ -56,7 +56,7 @@ def dependency_figure(
                     _node_color(name, modules[name], selected_module, dependencies, dependents)
                     for name in names
                 ],
-                "line": {"width": 1.5, "color": "rgba(237,244,255,0.72)"},
+                "line": {"width": 1.5},
             },
             name="Modules",
         )
@@ -69,18 +69,12 @@ def dependency_figure(
         dragmode="pan",
         font={
             "family": "Inter, Segoe UI, sans-serif",
-            "color": "#AABBD0",
         },
-        title_font={"color": "#EDF4FF", "size": 17},
+        title_font={"size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         margin={"l": 18, "r": 18, "t": 62, "b": 20},
         height=560,
-        hoverlabel={
-            "bgcolor": "#142641",
-            "bordercolor": "#2A4968",
-            "font": {"color": "#EDF4FF"},
-        },
         xaxis={"visible": False},
         yaxis={"visible": False},
     )
@@ -169,8 +163,8 @@ def _empty_graph() -> go.Figure:
     )
     figure.update_layout(
         title="Internal Dependency Map",
-        font={"family": "Inter, Segoe UI, sans-serif", "color": "#AABBD0"},
-        title_font={"color": "#EDF4FF", "size": 17},
+        font={"family": "Inter, Segoe UI, sans-serif"},
+        title_font={"size": 17},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=560,

@@ -3,23 +3,34 @@
 APP_CSS = r"""
 <style>
 :root {
-    --atlas-bg: #07111f;
-    --atlas-bg-raised: #0a1627;
-    --atlas-panel: #101e33;
-    --atlas-panel-hover: #142641;
-    --atlas-border: rgba(148, 163, 184, 0.16);
-    --atlas-border-strong: rgba(83, 212, 255, 0.28);
-    --atlas-text: #edf4ff;
-    --atlas-muted: #91a4bd;
-    --atlas-subtle: #60738f;
-    --atlas-cyan: #53d4ff;
-    --atlas-indigo: #8587ff;
-    --atlas-green: #3dd6a3;
-    --atlas-yellow: #f9c74f;
-    --atlas-orange: #f8961e;
-    --atlas-red: #f05d75;
+    --atlas-bg: light-dark(#f5f7fb, #07111f);
+    --atlas-bg-raised: light-dark(#ffffff, #0a1627);
+    --atlas-panel: light-dark(#ffffff, #101e33);
+    --atlas-panel-hover: light-dark(#f0f4fa, #142641);
+    --atlas-border: light-dark(rgba(15, 23, 42, 0.13), rgba(148, 163, 184, 0.16));
+    --atlas-border-strong: light-dark(rgba(2, 132, 199, 0.30), rgba(83, 212, 255, 0.28));
+    --atlas-text: light-dark(#172033, #edf4ff);
+    --atlas-muted: light-dark(#526078, #91a4bd);
+    --atlas-subtle: light-dark(#748199, #60738f);
+    --atlas-cyan: light-dark(#007fa3, #53d4ff);
+    --atlas-indigo: light-dark(#5557c9, #8587ff);
+    --atlas-green: light-dark(#087d62, #3dd6a3);
+    --atlas-yellow: light-dark(#956200, #f9c74f);
+    --atlas-orange: light-dark(#b54c00, #f8961e);
+    --atlas-red: light-dark(#c73550, #f05d75);
+    --atlas-header: light-dark(rgba(245, 247, 251, 0.88), rgba(7, 17, 31, 0.82));
+    --atlas-ribbon: light-dark(#f8fbff, #0d1c30);
+    --atlas-sidebar: light-dark(#eef3f9, #081321);
+    --atlas-control: light-dark(#ffffff, #0d1b2d);
+    --atlas-alert: light-dark(#eef6ff, #0f2035);
+    --atlas-code: light-dark(#f1f5f9, #060e19);
+    --atlas-primary: light-dark(#007fa3, #53d4ff);
+    --atlas-primary-hover: light-dark(#006b8a, #78dfff);
+    --atlas-primary-text: light-dark(#ffffff, #04111c);
+    --atlas-privacy-text: light-dark(#35675b, #9ec7bd);
     --atlas-radius: 16px;
-    --atlas-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    --atlas-shadow: light-dark(0 18px 45px rgba(15, 23, 42, 0.10), 0 18px 50px rgba(0, 0, 0, 0.22));
+    --atlas-shadow-soft: light-dark(0 10px 28px rgba(15, 23, 42, 0.07), 0 10px 32px rgba(0, 0, 0, 0.12));
 }
 
 html, body, [class*="css"] {
@@ -32,8 +43,8 @@ html, body, [class*="css"] {
 }
 
 [data-testid="stHeader"] {
-    background: rgba(7, 17, 31, 0.82);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    background: var(--atlas-header);
+    border-bottom: 1px solid var(--atlas-border);
     backdrop-filter: blur(18px);
 }
 
@@ -72,30 +83,9 @@ a {
     color: var(--atlas-cyan) !important;
 }
 
-.atlas-kicker {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    color: var(--atlas-cyan);
-    font-size: 0.72rem;
-    font-weight: 750;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    margin-bottom: 0.15rem;
-}
-
-.atlas-kicker::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-    background: var(--atlas-green);
-    box-shadow: 0 0 18px rgba(61, 214, 163, 0.8);
-}
-
 .atlas-lead {
     max-width: 760px;
-    color: #aabbd0 !important;
+    color: var(--atlas-muted) !important;
     font-size: 1.08rem;
     line-height: 1.7;
     margin: 0 0 2.1rem;
@@ -116,7 +106,7 @@ a {
     margin: 0.3rem 0 1rem;
     border: 1px solid var(--atlas-border-strong);
     border-radius: var(--atlas-radius);
-    background: #0d1c30;
+    background: var(--atlas-ribbon);
     box-shadow: var(--atlas-shadow);
 }
 
@@ -167,7 +157,7 @@ a {
 }
 
 .tone-low { color: var(--atlas-green); }
-.tone-guarded { color: #8fd14f; }
+.tone-guarded { color: light-dark(#5f8500, #8fd14f); }
 .tone-moderate { color: var(--atlas-yellow); }
 .tone-high { color: var(--atlas-orange); }
 .tone-critical { color: var(--atlas-red); }
@@ -231,7 +221,7 @@ a {
 }
 
 [data-testid="stSidebar"] {
-    background: #081321;
+    background: var(--atlas-sidebar);
     border-right: 1px solid var(--atlas-border);
 }
 
@@ -258,13 +248,13 @@ a {
     place-items: center;
     width: 38px;
     height: 38px;
-    border: 1px solid rgba(83, 212, 255, 0.42);
+    border: 1px solid var(--atlas-border-strong);
     border-radius: 11px;
-    background: #11243a;
+    background: var(--atlas-panel-hover);
     color: var(--atlas-cyan);
     font-size: 1.05rem;
     font-weight: 800;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--atlas-shadow-soft);
 }
 
 .sidebar-brand__name {
@@ -286,10 +276,10 @@ a {
 
 .privacy-note {
     padding: 0.8rem 0.9rem;
-    border: 1px solid rgba(61, 214, 163, 0.18);
+    border: 1px solid color-mix(in srgb, var(--atlas-green) 24%, transparent);
     border-radius: 12px;
-    background: rgba(61, 214, 163, 0.055);
-    color: #9ec7bd;
+    background: color-mix(in srgb, var(--atlas-green) 7%, transparent);
+    color: var(--atlas-privacy-text);
     font-size: 0.74rem;
     line-height: 1.5;
 }
@@ -301,7 +291,7 @@ a {
 [data-testid="stTextInput"] input,
 [data-testid="stTextArea"] textarea,
 [data-baseweb="select"] > div {
-    background: #0d1b2d !important;
+    background: var(--atlas-control) !important;
     border-color: var(--atlas-border) !important;
     color: var(--atlas-text) !important;
     border-radius: 11px !important;
@@ -310,25 +300,25 @@ a {
 [data-testid="stTextInput"] input:focus,
 [data-testid="stTextArea"] textarea:focus {
     border-color: var(--atlas-cyan) !important;
-    box-shadow: 0 0 0 2px rgba(83, 212, 255, 0.12) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--atlas-cyan) 14%, transparent) !important;
 }
 
 .stButton > button[kind="primary"],
 .stDownloadButton > button[kind="primary"] {
     min-height: 2.75rem;
-    border: 1px solid #62dcff;
+    border: 1px solid var(--atlas-primary);
     border-radius: 11px;
-    background: #53d4ff;
-    color: #04111c;
+    background: var(--atlas-primary);
+    color: var(--atlas-primary-text);
     font-weight: 760;
-    box-shadow: 0 10px 30px rgba(83, 212, 255, 0.16);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--atlas-cyan) 18%, transparent);
 }
 
 .stButton > button[kind="primary"]:hover,
 .stDownloadButton > button[kind="primary"]:hover {
-    border-color: #9ae8ff;
-    background: #78dfff;
-    color: #04111c;
+    border-color: var(--atlas-primary-hover);
+    background: var(--atlas-primary-hover);
+    color: var(--atlas-primary-text);
     transform: translateY(-1px);
 }
 
@@ -347,7 +337,7 @@ a {
     border: 1px solid var(--atlas-border);
     border-radius: var(--atlas-radius);
     background: var(--atlas-panel);
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--atlas-shadow-soft);
     transition: border-color 150ms ease, transform 150ms ease;
 }
 
@@ -375,7 +365,7 @@ a {
     border-color: var(--atlas-border) !important;
     border-radius: var(--atlas-radius) !important;
     background: var(--atlas-panel) !important;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--atlas-shadow-soft);
 }
 
 [data-testid="stPlotlyChart"] {
@@ -395,7 +385,7 @@ a {
 [data-testid="stAlert"] {
     border-radius: 13px;
     border-color: var(--atlas-border) !important;
-    background: #0f2035 !important;
+    background: var(--atlas-alert) !important;
 }
 
 [data-testid="stExpander"] {
@@ -419,14 +409,14 @@ a {
 }
 
 [aria-selected="true"][data-baseweb="tab"] {
-    background: rgba(83, 212, 255, 0.08);
+    background: color-mix(in srgb, var(--atlas-cyan) 10%, transparent);
     color: var(--atlas-cyan);
 }
 
 [data-testid="stCode"] {
     border: 1px solid var(--atlas-border);
     border-radius: 13px;
-    background: #060e19;
+    background: var(--atlas-code);
 }
 
 hr {
