@@ -113,8 +113,8 @@ def render_function_details(
     for issue in issues:
         st.warning(f"{issue.message} ({issue.severity})")
 
-    st.markdown("##### Source preview")
-    st.code(
-        source_excerpt(function.file_path, function.start_line, function.end_line),
-        language="python",
-    )
+    with st.expander("Source preview", expanded=False):
+        st.code(
+            source_excerpt(function.file_path, function.start_line, function.end_line),
+            language="python",
+        )

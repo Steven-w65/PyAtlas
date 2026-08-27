@@ -51,6 +51,21 @@ def test_app_analyzes_project_and_renders_summary() -> None:
     assert len(app.dataframe) >= 3
 
 
+def test_function_source_preview_is_collapsed_by_default() -> None:
+    """Catch source code returning as an always-open, scroll-heavy section."""
+
+    app = AppTest.from_file(APP_PATH)
+    app.run(timeout=20)
+    app.text_input[0].input(str(SAMPLES / "simple_project"))
+    app.button[0].click()
+    app.run(timeout=30)
+
+    source_preview = next(
+        item for item in app.expander if item.label == "Source preview"
+    )
+    assert source_preview.proto.expanded is False
+
+
 def test_app_emits_no_streamlit_deprecation_warnings(caplog) -> None:
     """Catch retired widget arguments anywhere in the complete dashboard flow."""
 
