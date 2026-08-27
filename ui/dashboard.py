@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import MutableMapping
 from html import escape
+from typing import Any
 
 import streamlit as st
 
+from models import ProjectAnalysis
 from services import AnalysisService, ExportService
 from ui.function_details import render_function_details
 from ui.module_details import render_module_details
@@ -20,6 +23,8 @@ SESSION_DEFAULTS = {
     "analysis": None,
     "selected_module": None,
     "selected_function": None,
+    "graph_selected_module": None,
+    "hotspot_selection": None,
     "risk_filter": "All",
     "graph_size_label": "Confusion score",
     "ignore_patterns": "",
@@ -31,6 +36,44 @@ def initialize_session_state() -> None:
 
     for key, value in SESSION_DEFAULTS.items():
         st.session_state.setdefault(key, value)
+
+
+def synchronize_hotspot_selection(
+    state: MutableMapping[str, Any],
+    analysis: ProjectAnalysis,
+    selected: dict[str, Any] | None,
+) -> None:
+    """Apply a changed Hotspots selection before the dependency graph renders."""
+
+    selection_key = (
+        None
+        if selected is None
+        else (selected["Type"], selected["File"], selected["Name"])
+    )
+    if state.get("hotspot_selection") == selection_key:
+        return
+    state["hotspot_selection"] = selection_key
+    if selected is None:
+        state["graph_selected_module"] = None
+        return
+
+    selected_function: tuple[str, str] | None = None
+    if selected["Type"] == "Module":
+        module_name = selected["Name"]
+    else:
+        module_name = next(
+            (
+                module.name
+                for module in analysis.modules
+                if module.file_path == selected["File"]
+            ),
+            None,
+        )
+        selected_function = (selected["File"], selected["Name"])
+
+    state["graph_selected_module"] = module_name
+    state["selected_module"] = module_name
+    state["selected_function"] = selected_function
 
 
 def render_dashboard() -> None:
@@ -63,6 +106,8 @@ def render_dashboard() -> None:
                 st.session_state.analysis = result
                 st.session_state.selected_module = None
                 st.session_state.selected_function = None
+                st.session_state.graph_selected_module = None
+                st.session_state.hotspot_selection = None
                 st.session_state.pop("module_detail_picker", None)
                 st.session_state.pop("function_detail_picker", None)
 
@@ -137,13 +182,7 @@ def render_dashboard() -> None:
     hotspot_column, graph_column = st.columns([1.08, 1], gap="medium")
     with hotspot_column:
         selected = render_hotspots(analysis, request.risk_filter)
-    if selected:
-        if selected["Type"] == "Module":
-            st.session_state.selected_module = selected["Name"]
-            st.session_state.selected_function = None
-        else:
-            st.session_state.selected_function = (selected["File"], selected["Name"])
-            st.session_state.selected_module = None
+    synchronize_hotspot_selection(st.session_state, analysis, selected)
 
     with graph_column:
         st.markdown(
@@ -158,7 +197,7 @@ def render_dashboard() -> None:
         graph_event = st.plotly_chart(
             dependency_figure(
                 analysis,
-                selected_module=st.session_state.selected_module,
+                selected_module=st.session_state.graph_selected_module,
                 size_by=request.graph_size_by,
             ),
             width="stretch",
@@ -175,6 +214,7 @@ def render_dashboard() -> None:
         if isinstance(selected_name, (list, tuple)):
             selected_name = selected_name[0] if selected_name else None
         if selected_name in {module.name for module in analysis.modules}:
+            st.session_state.graph_selected_module = selected_name
             st.session_state.selected_module = selected_name
             st.session_state.selected_function = None
 

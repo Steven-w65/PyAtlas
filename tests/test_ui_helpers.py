@@ -2,6 +2,7 @@ from pathlib import Path
 
 import ui.project_overview as project_overview
 from services.analysis_service import AnalysisService
+from ui.dashboard import synchronize_hotspot_selection
 from ui.project_overview import (
     filter_hotspot_rows,
     hotspot_rows,
@@ -119,3 +120,57 @@ def test_visualizations_delegate_text_surfaces_to_streamlit_theme() -> None:
         assert figure.layout.hoverlabel.bgcolor is None
         assert figure.layout.hoverlabel.bordercolor is None
         assert figure.layout.hoverlabel.font.color is None
+
+
+def test_hotspot_function_selection_updates_graph_on_first_rerun_and_clears_on_deselect() -> None:
+    """Catch graph highlighting lagging one rerun behind Hotspots selection."""
+
+    analysis = AnalysisService().analyze_project(SAMPLES / "simple_project")
+    function = next(
+        item
+        for item in hotspot_rows(analysis)
+        if item["Type"] == "Function" and item["Name"] == "run"
+    )
+    state = {
+        "hotspot_selection": None,
+        "graph_selected_module": None,
+        "selected_module": None,
+        "selected_function": None,
+    }
+
+    synchronize_hotspot_selection(state, analysis, function)
+
+    assert state["graph_selected_module"] == "app"
+    assert state["selected_module"] == "app"
+    assert state["selected_function"] == (function["File"], function["Name"])
+
+    state["graph_selected_module"] = "helpers"
+    synchronize_hotspot_selection(state, analysis, function)
+    assert state["graph_selected_module"] == "helpers"
+
+    synchronize_hotspot_selection(state, analysis, None)
+
+    assert state["graph_selected_module"] is None
+    assert state["selected_module"] == "app"
+    assert state["selected_function"] == (function["File"], function["Name"])
+
+
+def test_hotspot_module_selection_targets_the_selected_module() -> None:
+    analysis = AnalysisService().analyze_project(SAMPLES / "simple_project")
+    module = next(
+        item
+        for item in hotspot_rows(analysis)
+        if item["Type"] == "Module" and item["Name"] == "helpers"
+    )
+    state = {
+        "hotspot_selection": None,
+        "graph_selected_module": None,
+        "selected_module": None,
+        "selected_function": ("old.py", "old"),
+    }
+
+    synchronize_hotspot_selection(state, analysis, module)
+
+    assert state["graph_selected_module"] == "helpers"
+    assert state["selected_module"] == "helpers"
+    assert state["selected_function"] is None
