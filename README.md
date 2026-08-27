@@ -1,2 +1,1 @@
-# pyinsightmap
-Interactive Python codebase analyzer that maps complexity, dependencies, hotspots, and maintainability risks with explainable scoring.
+PyAtlas — Interactive Python codebase analyzer for mapping complexity, dependencies, hotspots, and maintainability risk
