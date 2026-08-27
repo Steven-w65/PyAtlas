@@ -1,6 +1,6 @@
-.venv/
-venv/
-env/
+/.venv/
+/venv/
+/env/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -11,4 +11,3 @@ build/
 dist/
 *.egg-info/
 .streamlit/secrets.toml
-
